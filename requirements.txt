@@ -1,9 +1,10 @@
 gradio==4.21.0
 pydantic==2.5.3
 fastapi==0.109.2
-llama-index>=0.10.0
-llama-index-llms-mistralai
-llama-index-readers-file
-llama-index-tools-tavily-research
+llama-index==0.10.55
+llama-index-core==0.10.55
+llama-index-llms-mistralai==0.1.15
+llama-index-readers-file==0.1.25
+llama-index-tools-tavily-research==0.1.5
 requests
 pypdf
