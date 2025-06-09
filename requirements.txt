@@ -1,1 +1,9 @@
-huggingface_hub==0.25.2
+gradio==4.21.0
+pydantic==2.5.3
+fastapi==0.109.2
+llama-index>=0.10.0
+llama-index-llms-mistralai
+llama-index-readers-file
+llama-index-tools-tavily-research
+requests
+pypdf
