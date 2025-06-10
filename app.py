@@ -42,13 +42,20 @@ def topic_exploration_flow(topic_query):
 
         # 1. Run Scout Agent to get paper URLs
         gr.Info("Scout Agent is searching for relevant papers...")
+        
+        # We automatically focus the search on arXiv for better results.
+        formatted_query = f"{topic_query} site:arxiv.org"
+        print(f"DEBUGGING: Sending formatted query to scout: '{formatted_query}'")
+        
         scout_agent = create_scout_agent(Settings.llm)
-        response = scout_agent.chat(topic_query)
+        # We pass the more specific query to the agent.
+        response = scout_agent.chat(formatted_query)
         urls = [line.strip() for line in response.response.split('\n') if line.strip().startswith('http')]
 
         if not urls:
             return "Scout Agent could not find any relevant papers. Please try a different query."
 
+        # The rest of the function remains the same...
         # 2. Loop through URLs and analyze each paper
         all_reports = []
         for i, url in enumerate(urls):
