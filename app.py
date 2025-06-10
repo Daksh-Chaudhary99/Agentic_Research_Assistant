@@ -62,7 +62,17 @@ with gr.Blocks(theme=gr.themes.Soft(), title="AI Research Assistant") as demo:
                 pdf_input = gr.File(type="filepath", label="Upload Research Paper (PDF)")
                 analyze_button_pdf = gr.Button("Analyze Paper", variant="primary")
                 pdf_output = gr.Markdown(label="Analysis Report")
-            analyze_button_pdf.click(fn=pdf_analysis_flow, inputs=[pdf_input], outputs=[pdf_output])
+
+            analyze_button_pdf.click(
+                fn=lambda: None,  
+                inputs=None,
+                outputs=[pdf_output]
+            ).then(
+                fn=pdf_analysis_flow, 
+                inputs=[pdf_input], 
+                outputs=[pdf_output]
+            )
+            # analyze_button_pdf.click(fn=pdf_analysis_flow, inputs=[pdf_input], outputs=[pdf_output])
 
         with gr.TabItem("Explore a Research Topic"):
             with gr.Column():
