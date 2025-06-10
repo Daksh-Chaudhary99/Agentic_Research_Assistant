@@ -54,38 +54,39 @@ def run_analysis_on_single_paper(documents):
     # Step 4: Synthesize the final report using the global Settings.llm
     print("Lead Researcher: Synthesizing final report...")
 
-    synthesis_prompt = f"""You are a master science communicator and Lead Researcher. Your task is to synthesize the detailed reports from your specialist team into a single, polished, and highly intuitive final report. The goal is for someone to understand the paper's essence and potential on a first read.
+    synthesis_prompt = f"""You are a Lead Researcher compiling a technical brief for a research group. Synthesize the reports from your specialist agents into a single, structured, and technically deep analysis. The intended audience is graduate students and researchers in the field.
 
     Structure the final report in Markdown exactly as follows:
 
-    # [Paper Title - Generate a fitting title based on the content]
+    # Technical Analysis: [Paper Title - Generate a fitting title]
 
-    ## The Core Idea in a Nutshell
-    (Provide a one-paragraph, easy-to-understand summary of what this paper is about and why it matters. Use an analogy if possible.)
-
-    ---
-
-    ## How It Works: The Methodology Explained
-    (Synthesize the Methodology Analyst's report here. Ensure it flows like a story, explaining the 'why' behind each step.)
+    ## 1. Abstract Summary
+    (Provide a concise summary of the paper's core contributions, methods, and key results, similar to a conference abstract.)
 
     ---
 
-    ## What They Found: Results and Key Takeaways
-    (Synthesize the Results Analyst's report. Present the key data and, most importantly, the interpretation and takeaways.)
+    ## 2. Core Architecture and Methodology
+    (Synthesize the Methodology Analyst's report. Deconstruct the system's architecture and the flow of data or logic. Use bullet points to detail key components and algorithms.)
 
     ---
 
-    ## The Scientific Context: Foundational Work
-    (Synthesize the Citation Analyst's report. Explain the key prior works and how this paper connects to them.)
+    ## 3. Quantitative Results & Critical Analysis
+    (Synthesize the Results Analyst's report. Display the main data in tables. Provide a critical analysis of what these results mean, their statistical significance, and how they support the paper's thesis.)
 
     ---
 
-    ## Where to Go From Here: Future Research Trajectories
-    (Synthesize the Future-Work Scout's report. Present the actionable next steps as clear, distinct ideas.)
+    ## 4. Positioning in the Field
+    (Synthesize the Citation Analyst's report. Clearly articulate how this work differs from or improves upon specific, named alternative approaches.)
 
+    ---
+
+    ## 5. Proposed Future Research Directions
+    (Synthesize the Future-Work Scout's report. Present the concrete, technically-grounded hypotheses and experimental ideas for extending this research.)
+    
     ---
     
-    **Specialist Reports Used for this Synthesis:**
+    **Source Reports from Specialist Agents:**
+    (Include the raw reports below for reference)
 
     **Methodology Report:**
     {individual_reports.get('Methodology', 'N/A')}
@@ -93,14 +94,14 @@ def run_analysis_on_single_paper(documents):
     **Results Report:**
     {individual_reports.get('Results', 'N/A')}
 
-    **Foundational Citations Report:**
+    **Citations Report:**
     {individual_reports.get('Citations', 'N/A')}
 
     **Future Work Report:**
     {individual_reports.get('Future Work', 'N/A')}
     ---
 
-    Now, generate the final, synthesized report based on these instructions.
+    Generate the final, synthesized report.
     """
     
     final_report = Settings.llm.complete(synthesis_prompt)
