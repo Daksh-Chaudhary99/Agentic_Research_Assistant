@@ -5,7 +5,6 @@ from agents import (
     create_specialist_agent, 
     METHODOLOGY_PROMPT, 
     RESULTS_PROMPT, 
-    CITATION_PROMPT, 
     FUTURE_WORK_PROMPT
 )
 
@@ -26,7 +25,7 @@ def run_analysis_on_single_paper(documents):
     specialists = {
         "Methodology": create_specialist_agent(METHODOLOGY_PROMPT, Settings.llm, query_tool),
         "Results": create_specialist_agent(RESULTS_PROMPT, Settings.llm, query_tool),
-        "Citations": create_specialist_agent(CITATION_PROMPT, Settings.llm, query_tool),
+        # "Citations": create_specialist_agent(CITATION_PROMPT, Settings.llm, query_tool),
         "Future Work": create_specialist_agent(FUTURE_WORK_PROMPT, Settings.llm, query_tool),
     }
 
@@ -36,7 +35,7 @@ def run_analysis_on_single_paper(documents):
     tasks = {
         "Methodology": "Analyze the methodology in detail.",
         "Results": "Summarize the key results and performance metrics.",
-        "Citations": "Identify and explain the importance of foundational citations.",
+        # "Citations": "Identify and explain the importance of foundational citations.",
         "Future Work": "List the identified research gaps and future work.",
     }
 
@@ -75,31 +74,9 @@ def run_analysis_on_single_paper(documents):
 
     ---
 
-    ## 4. Positioning in the Field
-    (Synthesize the Citation Analyst's report. Clearly articulate how this work differs from or improves upon specific, named alternative approaches.)
-
-    ---
 
     ## 5. Proposed Future Research Directions
     (Synthesize the Future-Work Scout's report. Present the concrete, technically-grounded hypotheses and experimental ideas for extending this research.)
-    
-    ---
-    
-    **Source Reports from Specialist Agents:**
-    (Include the raw reports below for reference)
-
-    **Methodology Report:**
-    {individual_reports.get('Methodology', 'N/A')}
-
-    **Results Report:**
-    {individual_reports.get('Results', 'N/A')}
-
-    **Citations Report:**
-    {individual_reports.get('Citations', 'N/A')}
-
-    **Future Work Report:**
-    {individual_reports.get('Future Work', 'N/A')}
-    ---
 
     Generate the final, synthesized report.
     """
