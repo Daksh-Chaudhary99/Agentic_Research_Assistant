@@ -1,66 +1,42 @@
+# app.py (Corrected to use run_analysis_on_single_paper)
+
 import gradio as gr
 import os
 import re
-import hashlib
 from llama_index.core import Settings
 from llama_index.readers.file import PDFReader
 from llama_index.embeddings.mistralai import MistralAIEmbedding
-
-# Import our custom modules
 from utils import get_llm, download_pdf_from_url
 from agents import create_scout_agent
-from analysis import get_chat_engine_for_paper # We'll reuse this logic for the PDF tab
+from analysis import run_analysis_on_single_paper
 
 # --- Orchestrator Functions for Gradio ---
 
-def pdf_upload_flow(pdf_file, progress=gr.Progress()):
+def pdf_analysis_flow(pdf_file, progress=gr.Progress()):
+    """A simple workflow for the 'Analyze a Specific PDF' tab."""
     if pdf_file is None:
         raise gr.Error("Please upload a PDF file.")
-    
-    pdf_contents = pdf_file.read()
-    paper_id = hashlib.md5(pdf_contents).hexdigest()
-    
-    progress(0, desc="Setting up AI models...")
-    Settings.embed_model = MistralAIEmbedding(model_name="mistral-embed")
-    Settings.llm = get_llm()
+        
+    try:
+        progress(0.2, desc="Setting up AI models...")
+        Settings.embed_model = MistralAIEmbedding(model_name="mistral-embed")
+        Settings.llm = get_llm()
 
-    progress(0.3, desc="Loading PDF...")
-    # Use BytesIO to handle the binary file data
-    from io import BytesIO
-    documents = PDFReader().load_data(file=BytesIO(pdf_contents))
-    
-    progress(0.6, desc="Creating/loading paper knowledge base...")
-    chat_engine = get_chat_engine_for_paper(documents, paper_id)
+        progress(0.5, desc="Analyzing paper...")
+        documents = PDFReader().load_data(file=pdf_file.name)
+        report_title = f"# Analysis of: *{os.path.basename(pdf_file.name)}*\n\n"
+        
+        # Call the original analysis function
+        final_report = run_analysis_on_single_paper(documents)
+        
+        return report_title + final_report
+    except Exception as e:
+        print(f"An error occurred in pdf_analysis_flow: {e}")
+        return f"An error occurred: {e}"
 
-    initial_message = "The paper is ready for questions. What would you like to know?"
-    
-    return (
-        chat_engine,
-        [(None, initial_message)],
-        gr.update(visible=True),
-        gr.update(visible=False)
-    )
-
-def handle_chat_interaction(user_message, history, chat_engine):
-    if not user_message:
-        raise gr.Error("Please enter a message.")
-    if not chat_engine:
-        raise gr.Error("Please upload and analyze a paper first.")
-
-    history.append((user_message, None))
-    response = chat_engine.stream_chat(user_message)
-    
-    history[-1] = (user_message, "")
-    for token in response.response_stream:
-        history[-1] = (user_message, history[-1][1] + token)
-        yield history, ""
-
-# --- New functions for the "Explore Topic" tab ---
 
 def scout_agent_flow(topic_query, progress=gr.Progress()):
-    """
-    Step 1 for the Explore tab: Runs ONLY the scout agent.
-    """
+    """Step 1 for the Explore tab: Runs ONLY the scout agent."""
     if not topic_query:
         raise gr.Error("Please enter a research topic.")
 
@@ -78,37 +54,32 @@ def scout_agent_flow(topic_query, progress=gr.Progress()):
 
 
 def url_analysis_flow(url_to_analyze, progress=gr.Progress()):
-    """
-    Step 2 for the Explore tab: Analyzes a single URL provided by the user.
-    """
+    """Step 2 for the Explore tab: Analyzes a single URL provided by the user."""
     if not url_to_analyze or not url_to_analyze.startswith("http"):
         raise gr.Error("Please enter a valid URL from the list above.")
 
-    progress(0, desc="Setting up AI models...")
-    Settings.embed_model = MistralAIEmbedding(model_name="mistral-embed")
-    Settings.llm = get_llm()
+    try:
+        progress(0, desc="Setting up AI models...")
+        Settings.embed_model = MistralAIEmbedding(model_name="mistral-embed")
+        Settings.llm = get_llm()
 
-    # We need to create a unique ID for the paper from its URL
-    paper_id = hashlib.md5(url_to_analyze.encode()).hexdigest()
-    
-    progress(0.2, desc=f"Downloading paper from {url_to_analyze}...")
-    pdf_url = url_to_analyze.replace("/abs/", "/pdf/") if "arxiv.org/abs" in url_to_analyze else url_to_analyze
-    pdf_stream = download_pdf_from_url(pdf_url)
+        progress(0.2, desc=f"Downloading paper from {url_to_analyze}...")
+        pdf_url = url_to_analyze.replace("/abs/", "/pdf/") if "arxiv.org/abs" in url_to_analyze else url_to_analyze
+        pdf_stream = download_pdf_from_url(pdf_url)
 
-    if not pdf_stream:
-        raise gr.Error("Failed to download the PDF from the provided URL.")
+        if not pdf_stream:
+            raise gr.Error("Failed to download the PDF from the provided URL.")
 
-    progress(0.5, desc="Analyzing paper...")
-    documents = PDFReader().load_data(file=pdf_stream)
-
-    # We can reuse our single-paper analysis engine here!
-    # For simplicity, we will create a new chat engine instance.
-    chat_engine = get_chat_engine_for_paper(documents, paper_id)
-    
-    # Ask the engine to provide an initial summary
-    initial_summary = chat_engine.chat("Provide a concise, one-paragraph executive summary of this research paper.")
-
-    return str(initial_summary)
+        progress(0.5, desc="Analyzing paper...")
+        documents = PDFReader().load_data(file=pdf_stream)
+        
+        # Call the original analysis function
+        final_report = run_analysis_on_single_paper(documents)
+        
+        return final_report
+    except Exception as e:
+        print(f"An error occurred in url_analysis_flow: {e}")
+        return f"An error occurred: {e}"
 
 
 # --- Gradio UI Definition ---
@@ -117,20 +88,15 @@ with gr.Blocks(theme=gr.themes.Soft(), title="AI Research Assistant") as demo:
     gr.Markdown("# 🤖 AI Research Assistant")
     gr.Markdown("Your AI-powered partner for literature discovery and analysis, powered by Mistral.")
     
-    chat_engine_state = gr.State()
-
     with gr.Tabs():
+        
         with gr.TabItem("Analyze a Specific PDF"):
             with gr.Column():
-                with gr.Box(visible=True) as analysis_box:
-                    pdf_input = gr.File(type="binary", label="Upload Research Paper (PDF)")
-                    analyze_button_pdf = gr.Button("Analyze Paper", variant="primary")
-                with gr.Column(visible=False) as chat_ui:
-                    chatbot = gr.Chatbot(label="Chat with Paper", height=500)
-                    chat_textbox = gr.Textbox(label="Ask a question...", show_label=False, placeholder="e.g., What was the main contribution of this paper?")
-                    chat_textbox.submit(fn=handle_chat_interaction, inputs=[chat_textbox, chatbot, chat_engine_state], outputs=[chatbot, chat_textbox])
-            analyze_button_pdf.click(fn=pdf_upload_flow, inputs=[pdf_input], outputs=[chat_engine_state, chatbot, chat_ui, analysis_box])
+                pdf_input = gr.File(type="filepath", label="Upload Research Paper (PDF)")
+                analyze_button_pdf = gr.Button("Analyze Paper", variant="primary")
+                pdf_output = gr.Markdown(label="Analysis Report")
 
+        # This tab uses the two-step workflow
         with gr.TabItem("Explore a Research Topic"):
             with gr.Column():
                 # Step 1 UI
@@ -146,17 +112,22 @@ with gr.Blocks(theme=gr.themes.Soft(), title="AI Research Assistant") as demo:
                 
                 single_analysis_display = gr.Markdown(label="Deep-Dive Analysis")
 
-            # Wire up the buttons for the two-step flow
-            explore_button.click(
-                fn=scout_agent_flow,
-                inputs=[topic_input],
-                outputs=[scout_results_display, url_analysis_box]
-            )
-            analyze_url_button.click(
-                fn=url_analysis_flow,
-                inputs=[url_input_textbox],
-                outputs=[single_analysis_display]
-            )
+    # Wire up the buttons to the backend functions
+    analyze_button_pdf.click(
+        fn=pdf_analysis_flow, 
+        inputs=[pdf_input], 
+        outputs=[pdf_output]
+    )
+    explore_button.click(
+        fn=scout_agent_flow,
+        inputs=[topic_input],
+        outputs=[scout_results_display, url_analysis_box]
+    )
+    analyze_url_button.click(
+        fn=url_analysis_flow,
+        inputs=[url_input_textbox],
+        outputs=[single_analysis_display]
+    )
 
 if __name__ == "__main__":
     demo.launch()
