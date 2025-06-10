@@ -21,26 +21,6 @@ Provide a comprehensive technical analysis by structuring your response in Markd
 (Propose 2-3 concrete, technically-grounded hypotheses for extending this research. For each, describe a potential experiment or technical extension.)
 """
 
-# # The master prompt that asks for everything at once.
-# COMPREHENSIVE_ANALYSIS_PROMPT = """
-# Provide a comprehensive technical analysis of the document for a knowledgeable audience (e.g., graduate students, researchers). Structure your response in Markdown with the following sections, in this exact order:
-
-# ## 1. Abstract Summary
-# (A concise summary of the paper's core contributions, methods, and key results, similar to a conference abstract.)
-
-# ## 2. Core Architecture and Methodology
-# (Deconstruct the system's architecture and the flow of data or logic. Use bullet points to detail key components and algorithms. Be technically precise.)
-
-# ## 3. Quantitative Results & Critical Analysis
-# (Present the main quantitative results in a list or responsive format (NO WIDE TABLES). Provide a brief but critical analysis of what these results mean.)
-
-# ## 4. Positioning in the Field
-# (Situate this work by comparing it to 1-2 key alternative approaches mentioned in the paper, highlighting its unique technical differentiators.)
-
-# ## 5. Proposed Future Research Directions
-# (Propose 2-3 concrete, technically-grounded hypotheses and experimental ideas for extending this research based on the paper's conclusion or limitations.)
-# """
-
 def run_analysis_on_single_paper(documents):
     """
     This simplified version creates an index and runs a single, comprehensive query against it.

@@ -2,11 +2,11 @@ import gradio as gr
 import os
 import re
 import hashlib
-from llama_index.core import Settings
+from llama_index.core import Settings, Document
 from llama_index.readers.file import PDFReader
 from llama_index.embeddings.mistralai import MistralAIEmbedding
-from utils import get_llm, download_pdf_from_url
-from agents import create_scout_agent
+from utils import get_llm, download_pdf_from_url, format_to_bibtex
+from agents import create_scout_agent, create_specialist_agent, CITATION_EXTRACTOR_PROMPT
 from analysis import run_analysis_on_single_paper
 
 # --- Orchestrator Functions for Gradio ---
@@ -33,6 +33,29 @@ def pdf_analysis_flow(pdf_file, progress=gr.Progress()):
         print(f"An error occurred in pdf_analysis_flow: {e}")
         return f"An error occurred: {e}"
 
+def export_bibtex_flow(documents, file_obj):
+    """Workflow for the 'Export Citation' button."""
+    if not documents:
+        raise gr.Error("Please analyze a paper first.")
+    
+    filename = os.path.basename(file_obj.name)
+    print(f"--- BibTeX Export: Starting citation extraction for {filename} ---")
+    
+    first_page_text = documents[0].text
+
+    # We only need the LLM for this, no other tools.
+    Settings.llm = get_llm()
+    extractor_agent = create_specialist_agent(CITATION_EXTRACTOR_PROMPT, Settings.llm, [])
+    
+    # Give the agent the text and ask it to perform its task
+    response = extractor_agent.chat(f"Extract bibliographic data from this text: {first_page_text[:4000]}")
+    
+    print(f"--- BibTeX Export: Agent responded with: {response.response} ---")
+    
+    # Format the extracted JSON into a BibTeX string
+    bibtex_string = format_to_bibtex(response.response, filename)
+    
+    return bibtex_string
 
 def scout_agent_flow(topic_query, progress=gr.Progress()):
     """This function now runs the scout agent and directly returns its summary."""
