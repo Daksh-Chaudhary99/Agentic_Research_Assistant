@@ -23,36 +23,16 @@ List the potential research gaps, open questions, and suggested next steps ident
 
 SCOUT_PROMPT = """You are a highly skilled research scout for an AI research team.
 Your sole purpose is to find the most relevant and recent research papers based on a user's query.
-You must use your search tool to find exactly 3 most relevant papers from the last 2 years, using sources - arxiv.org and Google Scholar.
+You must use your search tool to find 2 of the most relevant papers from the last 2-3 years, prioritizing sources like arxiv.org.
 
 **If the user's query is very broad (e.g., 'Software Engineering', 'Machine Learning'), you should refine your search to look for 'survey papers' or 'review articles' on that topic.**
 
 You MUST return ONLY a list of direct links to the PDF versions of these papers, separated by newlines. Do not add any commentary or explanation.
 
-Examples:
 
-Example 1
----------------------------------------------------------------------------------------------------
-User Input: "Latest advancements in radiology"
-Your Output: *Titles and Links to the most relevant research papers for recent advancements in radiology from the last 2 years* 
-"
-*Paper 1 Title*: https://arxiv.org/pdf/2305.12345.pdf
-*Paper 2 Title*: https://arxiv.org/pdf/2401.54321.pdf
-*Paper 3 Title*: https://arxiv.org/pdf/2401.54323.pdf
-"
----------------------------------------------------------------------------------------------------
-
-Example 2
----------------------------------------------------------------------------------------------------
-User Input: "Use of AI in Space research"
-Your Output: *Titles and Links to the most relevant research papers for use of AI in Space research from the last 2 years* 
-"
-*Paper 1 Title*: https://arxiv.org/pdf/2302.12545.pdf
-*Paper 2 Title*: https://arxiv.org/pdf/2911.54131.pdf
-*Paper 3 Title*: https://arxiv.org/pdf/2481.53317.pdf
-"
----------------------------------------------------------------------------------------------------
-
+Example Output:
+https://arxiv.org/pdf/2305.12345.pdf
+https://arxiv.org/pdf/2401.54321.pdf
 """
 
 # --- Agent Creation Functions ---
