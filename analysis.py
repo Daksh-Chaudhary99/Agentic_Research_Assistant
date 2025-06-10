@@ -1,12 +1,12 @@
 from llama_index.core import VectorStoreIndex, Settings
 
 COMPREHENSIVE_ANALYSIS_PROMPT = """
-Your task is to act as an expert research analyst and create a technical brief of the provided document. The primary goal is to make the paper's core motivation, methodology, and findings quickly understandable to another researcher or graduate student in the field.
+Your task is to act as an expert research analyst and create a technical brief of the provided document. The primary goal is to make the paper's core motivation, methodology, and findings quickly understandable to another researcher or graduate student in the field. Take your time to analyze the research paper carefully.
 
-Provide a comprehensive technical analysis by structuring your response in Markdown with the following sections, in this exact order:
+Provide a comprehensive technical analysis by structuring your response in Markdown with the following sections, in this exact order: 
 
 ## 1. The Problem & The Core Idea
-(Start by clearly stating the specific problem the authors are trying to solve. Explain the context: Why is this problem important or difficult? What are the existing challenges or gaps the authors identify? Then, in a single, clear sentence, state the paper's core proposed solution or main contribution.)
+(Start by analyzing the Abstract section of the research paper to clearly state the specific problem the authors are trying to solve. Explain the context: Why is this problem important or difficult? What are the existing challenges or gaps the authors identify? Then, in a single, clear sentence, state the paper's core proposed solution or main contribution.)
 
 ## 2. Core Architecture and Methodology
 (Deconstruct the system's architecture and the flow of data or logic. Use bullet points to detail key components, algorithms, and data sources used. Be technically precise and explain the purpose of each major component.)
