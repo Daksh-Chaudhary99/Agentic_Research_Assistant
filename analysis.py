@@ -9,31 +9,25 @@ from agents import (
     FUTURE_WORK_PROMPT
 )
 
-def run_analysis_on_single_paper(documents, llm):
+
+def run_analysis_on_single_paper(documents):
     """
     Orchestrates the multi-agent analysis for a single paper.
-    
-    Args:
-        documents (list): A list of LlamaIndex Document objects.
-        llm (LLM): The LLM instance to use for the analysis.
-        
-    Returns:
-        str: A formatted markdown report of the analysis.
+    It now uses the globally set LLM from Settings.
     """
-    Settings.llm = llm
-
-    # Step 1: Librarian Agent builds the knowledge base
+    
+    # Step 1: Librarian Agent builds the knowledge base (uses the global embed_model)
     print("Librarian Agent: Indexing the document...")
     index = VectorStoreIndex.from_documents(documents)
     query_tool = get_query_tool(index)
     print("Librarian Agent: Knowledge base is ready.")
 
-    # Step 2: Assemble the specialist team
+    # Step 2: Assemble the specialist team, using the global Settings.llm
     specialists = {
-        "Methodology": create_specialist_agent(METHODOLOGY_PROMPT, llm, query_tool),
-        "Results": create_specialist_agent(RESULTS_PROMPT, llm, query_tool),
-        "Citations": create_specialist_agent(CITATION_PROMPT, llm, query_tool),
-        "Future Work": create_specialist_agent(FUTURE_WORK_PROMPT, llm, query_tool),
+        "Methodology": create_specialist_agent(METHODOLOGY_PROMPT, Settings.llm, query_tool),
+        "Results": create_specialist_agent(RESULTS_PROMPT, Settings.llm, query_tool),
+        "Citations": create_specialist_agent(CITATION_PROMPT, Settings.llm, query_tool),
+        "Future Work": create_specialist_agent(FUTURE_WORK_PROMPT, Settings.llm, query_tool),
     }
 
     # Step 3: Run specialists in parallel
@@ -57,27 +51,22 @@ def run_analysis_on_single_paper(documents, llm):
             except Exception as exc:
                 individual_reports[role] = f"Error processing {role}: {exc}"
 
-    # Step 4: Synthesize the final report
+    # Step 4: Synthesize the final report using the global Settings.llm
     print("Lead Researcher: Synthesizing final report...")
     synthesis_prompt = f"""You are the Lead Researcher. You have received reports from your specialist team.
     Your job is to synthesize these into a single, cohesive, and well-structured final analysis.
     The report should be accessible to a technical audience. Format it in markdown.
-
     --- Methodology Report ---
     {individual_reports.get('Methodology', 'N/A')}
-
     --- Results Report ---
     {individual_reports.get('Results', 'N/A')}
-
     --- Foundational Citations Report ---
     {individual_reports.get('Citations', 'N/A')}
-
     --- Future Work Report ---
     {individual_reports.get('Future Work', 'N/A')}
     ---
-
     Synthesize the final report now. Start with a high-level summary, then detail each section.
     """
     
-    final_report = llm.complete(synthesis_prompt)
+    final_report = Settings.llm.complete(synthesis_prompt)
     return final_report.text
