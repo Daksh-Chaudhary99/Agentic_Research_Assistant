@@ -20,6 +20,8 @@ short_description: A Multi-Agent based Research Assistant
 
 This project is a powerful, AI-powered web application designed to accelerate the process of academic research. It acts as an intelligent partner for researchers, graduate students, and anyone looking to quickly understand and explore scientific literature. The application is built using a modern agentic framework with LlamaIndex and is powered by the Mistral Large Language Model.
 
+Link to Project Demo: https://www.dropbox.com/scl/fi/f5dcler2ormu0h2tt4vgj/DakshC-Agentic-Research-Assistant-Made-with-Clipchamp.mp4?rlkey=jlk29ylgv5c8c3l4syzbz5ic5&st=1llckwas&dl=0
+
 ---
 
 ## ✨ Features
