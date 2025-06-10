@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+import re
 from io import BytesIO
 from llama_index.llms.mistralai import MistralAI
 
