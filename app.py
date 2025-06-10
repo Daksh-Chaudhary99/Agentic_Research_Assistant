@@ -45,13 +45,27 @@ def export_bibtex_flow(documents, file_obj):
     print(f"--- BibTeX Export: Starting citation extraction for {filename} ---")
     
     first_page_text = documents[0].text
+    
+    # --- THIS IS THE CORRECTED LOGIC ---
+    # Instead of creating an agent, we create a direct prompt for the LLM.
     Settings.llm = get_llm()
-    extractor_agent = create_specialist_agent(CITATION_EXTRACTOR_PROMPT, Settings.llm, [])
     
-    response = extractor_agent.chat(f"Extract bibliographic data from this text: {first_page_text[:4000]}")
+    # We combine the system prompt and the user message into one.
+    extraction_prompt = f"""{CITATION_EXTRACTOR_PROMPT}
+
+    Here is the text to analyze:
+    ---
+    {first_page_text[:4000]}
+    """
     
-    print(f"--- BibTeX Export: Agent responded with: {response.response} ---")
-    bibtex_string = format_to_bibtex(response.response, filename)
+    # Make a direct, simple call to the LLM.
+    response = Settings.llm.complete(extraction_prompt)
+    # --- END OF CORRECTION ---
+    
+    print(f"--- BibTeX Export: LLM responded with: {response.text} ---")
+    
+    # Format the extracted JSON into a BibTeX string
+    bibtex_string = format_to_bibtex(response.text, filename)
     
     return bibtex_string
 
