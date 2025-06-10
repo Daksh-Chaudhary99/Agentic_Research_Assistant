@@ -77,8 +77,7 @@ def run_analysis_on_single_paper(documents):
 
     ---
 
-
-    ## 5. Proposed Future Research Directions
+    ## 4. Proposed Future Research Directions
     (Synthesize the Future-Work Scout's report. Present the concrete, technically-grounded hypotheses and experimental ideas for extending this research.)
 
     Generate the final, synthesized report.
