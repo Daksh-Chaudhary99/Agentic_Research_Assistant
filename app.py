@@ -105,7 +105,7 @@ with gr.Blocks(theme=gr.themes.Soft(), title="AI Research Assistant") as demo:
                 scout_results_display = gr.Markdown(label="Scout Agent Findings")
                 
                 # Step 2 UI, hidden by default
-                with gr.Box(visible=False) as url_analysis_box:
+                with gr.Group(visible=False) as url_analysis_box:
                     gr.Markdown("Copy a URL from the summary above and paste it here for a deep-dive analysis.")
                     url_input_textbox = gr.Textbox(label="Paper URL to Analyze")
                     analyze_url_button = gr.Button("Analyze This Paper", variant="secondary")
