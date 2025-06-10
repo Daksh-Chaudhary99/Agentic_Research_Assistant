@@ -15,7 +15,8 @@ def pdf_analysis_flow(pdf_file, progress=gr.Progress()):
     """A simple workflow for the 'Analyze a Specific PDF' tab."""
     if pdf_file is None:
         raise gr.Error("Please upload a PDF file.")
-        
+
+    print(f"--- DEBUGGING: Starting analysis for file: {pdf_file.name} ---")
     try:
         progress(0.2, desc="Setting up AI models...")
         Settings.embed_model = MistralAIEmbedding(model_name="mistral-embed")
