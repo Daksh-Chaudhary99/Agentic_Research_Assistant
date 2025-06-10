@@ -8,7 +8,8 @@ sdk_version: 5.0.1
 python_version: 3.11
 app_file: app.py
 pinned: false
-tag: "agent-demo-track"
+tags:
+- agent-demo-track
 short_description: A Multi-Agent based Research Assistant
 ---
 
