@@ -81,5 +81,5 @@ def run_analysis_on_single_paper(documents):
     Generate the final, synthesized report.
     """
     
-    final_report = Settings.llm.complete(synthesis_prompt)
+    final_report = Settings.llm.complete(synthesis_prompt, max_tokens=4096)
     return final_report.text
