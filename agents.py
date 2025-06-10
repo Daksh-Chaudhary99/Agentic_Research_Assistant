@@ -57,7 +57,7 @@ def create_specialist_agent(system_prompt: str, llm, query_tool, verbose=False):
         verbose=verbose
     )
 
-def create_scout_agent(llm, verbose=False):
+def create_scout_agent(llm, verbose=True):
     """Creates the agent responsible for finding papers."""
     
     # 1. Read the API key securely from the environment variables
