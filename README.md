@@ -9,7 +9,7 @@ python_version: 3.11
 app_file: app.py
 pinned: false
 tags:
-- agent-demo-track
+  - agent-demo-track
 short_description: A Multi-Agent based Research Assistant
 ---
 
