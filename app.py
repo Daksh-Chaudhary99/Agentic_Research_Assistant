@@ -125,7 +125,7 @@ with gr.Blocks(theme=gr.themes.Soft(), title="AI Research Assistant") as demo:
     explore_button.click(
         fn=scout_agent_flow,
         inputs=[topic_input],
-        outputs=[scout_results_display, url_analysis_box]
+        outputs=[scout_results_display]
     )
 
 if __name__ == "__main__":
