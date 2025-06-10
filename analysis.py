@@ -40,19 +40,33 @@ def run_analysis_on_single_paper(documents):
         "Future Work": "List the identified research gaps and future work.",
     }
     
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        future_to_role = {executor.submit(agent.chat, tasks[role]): role for role, agent in specialists.items()}
-        for future in concurrent.futures.as_completed(future_to_role):
-            role = future_to_role[future]
-            try:
-                result = future.result()
-                individual_reports[role] = result.response
-                print(f"Lead Researcher: Received report from {role} Analyst.")
-            except Exception:
-                # --- DEBUGGING CODE ---
-                print(f"--- ERROR processing role: {role} ---")
-                traceback.print_exc()
-                individual_reports[role] = f"An error occurred while processing the '{role}' section."
+    # with concurrent.futures.ThreadPoolExecutor() as executor:
+    #     future_to_role = {executor.submit(agent.chat, tasks[role]): role for role, agent in specialists.items()}
+    #     for future in concurrent.futures.as_completed(future_to_role):
+    #         role = future_to_role[future]
+    #         try:
+    #             result = future.result()
+    #             individual_reports[role] = result.response
+    #             print(f"Lead Researcher: Received report from {role} Analyst.")
+    #         except Exception:
+    #             # --- DEBUGGING CODE ---
+    #             print(f"--- ERROR processing role: {role} ---")
+    #             traceback.print_exc()
+    #             individual_reports[role] = f"An error occurred while processing the '{role}' section."
+
+    # --- DEBUG BLOCK ---
+    for role, agent in specialists.items():
+        print(f"--- Running specialist: {role} ---")
+        try:
+            task = tasks[role]
+            result = agent.chat(task)
+            individual_reports[role] = result.response
+            print(f"Lead Researcher: Received report from {role} Analyst.")
+        except Exception:
+            print(f"--- ERROR processing role: {role} ---")
+            traceback.print_exc()
+            individual_reports[role] = f"An error occurred while processing the '{role}' section."
+    # --- END---
 
     # Step 4: Synthesize the final report using the global Settings.llm
     print("Lead Researcher: Synthesizing final report...")
