@@ -107,12 +107,6 @@ with gr.Blocks(theme=gr.themes.Soft(), title="AI Research Assistant") as demo:
                 explore_button = gr.Button("Explore Topic", variant="primary")
                 scout_results_display = gr.Markdown(label="Scout Agent Findings")
                 
-                with gr.Group(visible=False) as url_analysis_box:
-                    gr.Markdown("Copy a URL from the summary above and paste it here for a deep-dive analysis.")
-                    url_input_textbox = gr.Textbox(label="Paper URL to Analyze")
-                    analyze_url_button = gr.Button("Analyze This Paper", variant="secondary")
-                
-                single_analysis_display = gr.Markdown(label="Deep-Dive Analysis")
 
     # Wire up the "Analyze Paper" button to update the new components
     analyze_button_pdf.click(
@@ -132,11 +126,6 @@ with gr.Blocks(theme=gr.themes.Soft(), title="AI Research Assistant") as demo:
         fn=scout_agent_flow,
         inputs=[topic_input],
         outputs=[scout_results_display, url_analysis_box]
-    )
-    analyze_url_button.click(
-        fn=url_analysis_flow,
-        inputs=[url_input_textbox],
-        outputs=[single_analysis_display]
     )
 
 if __name__ == "__main__":
