@@ -35,6 +35,17 @@ https://arxiv.org/pdf/2305.12345.pdf
 https://arxiv.org/pdf/2401.54321.pdf
 """
 
+CITATION_EXTRACTOR_PROMPT = """You are a machine designed for bibliographic data extraction.
+From the provided text of a research paper's first page, identify the following fields: Title, a list of all Authors, and the Year of publication.
+You MUST respond ONLY with a single, minified JSON object containing these fields. Do not add any explanation or conversational text.
+
+Example Input:
+'RepairAgent: An Autonomous, LLM-Based Agent for Program Repair Islem Bouzenia University of Stuttgart... Michael Pradel University of Stuttgart... 2024...'
+
+Example Output:
+{"title": "RepairAgent: An Autonomous, LLM-Based Agent for Program Repair", "authors": ["Islem Bouzenia", "Michael Pradel"], "year": "2024"}
+"""
+
 # --- Agent Creation Functions ---
 
 def get_query_tool(index):
