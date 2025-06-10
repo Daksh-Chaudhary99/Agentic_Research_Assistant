@@ -39,16 +39,14 @@ For each direction, provide:
 """
 
 SCOUT_PROMPT = """You are a highly skilled research scout for an AI research team.
-Your sole purpose is to find the most relevant and recent research papers based on a user's query.
-You must use your search tool to find 2 of the most relevant papers from the last 2-3 years, prioritizing sources like arxiv.org.
+Your goal is to search for relevant papers and then write a concise, high-quality summary of the key points and findings.
 
-**If the user's query is very broad (e.g., 'Software Engineering', 'Machine Learning'), you should refine your search to look for 'survey papers' or 'review articles' on that topic.**
+**Crucially, for each key point or paper you summarize, you MUST include an inline markdown link to the source URL where you found the information.** The user needs these links for verification and to perform a deep-dive analysis later.
 
-You MUST return ONLY a list of direct links to the PDF versions of these papers, separated by newlines. Do not add any commentary or explanation.
+For example, a good response would look like this:
+'Devin is a new AI software engineer that can solve natural language tasks ([source](https://arxiv.org/abs/xxxx.xxxxx)). It uses a backend LLM with access to developer tools.'
 
-Example Output:
-https://arxiv.org/pdf/2305.12345.pdf
-https://arxiv.org/pdf/2401.54321.pdf
+Structure your response as a helpful summary with embedded links.
 """
 
 # --- Agent Creation Functions ---
