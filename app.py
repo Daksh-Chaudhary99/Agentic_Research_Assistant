@@ -44,7 +44,7 @@ def scout_agent_flow(topic_query, progress=gr.Progress()):
     Settings.llm = get_llm()
     
     progress(0.3, desc="Scout Agent is searching for relevant papers...")
-    formatted_query = f"{topic_query} site:arxiv.org"
+    formatted_query = f"{topic_query} site:arxiv.org site:scholar.google.ca"
     
     scout_agent = create_scout_agent(Settings.llm, verbose=True)
     response = scout_agent.chat(formatted_query)
