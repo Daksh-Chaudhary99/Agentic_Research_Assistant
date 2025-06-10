@@ -50,6 +50,13 @@ def topic_exploration_flow(topic_query):
         scout_agent = create_scout_agent(Settings.llm)
         # We pass the more specific query to the agent.
         response = scout_agent.chat(formatted_query)
+                
+        # --- DEBUGGING CODE ---
+        print("--- RAW AGENT RESPONSE ---")
+        print(response)
+        print("--- END RAW AGENT RESPONSE ---")
+        # --- DEBUGGING CODE ---
+        
         urls = [line.strip() for line in response.response.split('\n') if line.strip().startswith('http')]
 
         if not urls:
