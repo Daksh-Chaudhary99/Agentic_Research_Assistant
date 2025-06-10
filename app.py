@@ -80,6 +80,9 @@ with gr.Blocks(theme=gr.themes.Soft(), title="AI Research Assistant") as demo:
     gr.Markdown("# 🤖 AI Research Assistant")
     gr.Markdown("Your AI-powered partner for literature discovery and analysis, powered by Mistral.")
     
+    # State to hold the document object for use by the export tool
+    document_state = gr.State()
+    
     with gr.Tabs():
         with gr.TabItem("Analyze a Specific PDF"):
             with gr.Column():
@@ -87,23 +90,54 @@ with gr.Blocks(theme=gr.themes.Soft(), title="AI Research Assistant") as demo:
                 analyze_button_pdf = gr.Button("Analyze Paper", variant="primary")
                 pdf_output = gr.Markdown(label="Analysis Report")
 
-            analyze_button_pdf.click(
-                fn=lambda: None,  
-                inputs=None,
-                outputs=[pdf_output]
-            ).then(
-                fn=pdf_analysis_flow, 
-                inputs=[pdf_input], 
-                outputs=[pdf_output]
-            )
-            # analyze_button_pdf.click(fn=pdf_analysis_flow, inputs=[pdf_input], outputs=[pdf_output])
-
+                # A hidden group for our post-analysis tools
+                with gr.Group(visible=False) as tools_group:
+                    gr.Markdown("### 🛠️ Tools")
+                    export_bibtex_button = gr.Button("Export Citation (.bib)")
+                    bibtex_output = gr.Textbox(
+                        label="BibTeX Citation", 
+                        show_copy_button=True, 
+                        interactive=False,
+                        lines=7
+                    )
+        
         with gr.TabItem("Explore a Research Topic"):
             with gr.Column():
                 topic_input = gr.Textbox(lines=3, label="Enter your Research Topic or Idea")
                 explore_button = gr.Button("Explore Topic", variant="primary")
                 scout_results_display = gr.Markdown(label="Scout Agent Findings")
-            explore_button.click(fn=scout_agent_flow, inputs=[topic_input], outputs=[scout_results_display])
+                
+                with gr.Group(visible=False) as url_analysis_box:
+                    gr.Markdown("Copy a URL from the summary above and paste it here for a deep-dive analysis.")
+                    url_input_textbox = gr.Textbox(label="Paper URL to Analyze")
+                    analyze_url_button = gr.Button("Analyze This Paper", variant="secondary")
+                
+                single_analysis_display = gr.Markdown(label="Deep-Dive Analysis")
+
+    # Wire up the "Analyze Paper" button to update the new components
+    analyze_button_pdf.click(
+        fn=pdf_analysis_flow, 
+        inputs=[pdf_input], 
+        outputs=[pdf_output, document_state, tools_group]
+    )
+    
+    # Wire up the new "Export Citation" button
+    export_bibtex_button.click(
+        fn=export_bibtex_flow,
+        inputs=[document_state, pdf_input],
+        outputs=[bibtex_output]
+    )
+    
+    explore_button.click(
+        fn=scout_agent_flow,
+        inputs=[topic_input],
+        outputs=[scout_results_display, url_analysis_box]
+    )
+    analyze_url_button.click(
+        fn=url_analysis_flow,
+        inputs=[url_input_textbox],
+        outputs=[single_analysis_display]
+    )
 
 if __name__ == "__main__":
     demo.launch()
