@@ -14,7 +14,7 @@ def get_llm():
     if not mistral_api_key:
         raise ValueError("MISTRAL_API_KEY environment variable not set. Please set it before running the app.")
     
-    return MistralAI(api_key=mistral_api_key, model="mistral-small-latest", timeout=240)
+    return MistralAI(api_key=mistral_api_key, model="mistral-medium-latest", timeout=240)
 
 def download_pdf_from_url(url: str):
     """Downloads PDF content from a URL and returns it as a BytesIO stream."""
