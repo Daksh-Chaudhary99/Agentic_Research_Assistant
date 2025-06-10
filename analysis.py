@@ -1,117 +1,42 @@
-import concurrent.futures
 from llama_index.core import VectorStoreIndex, Settings
-from agents import (
-    get_query_tool, 
-    create_specialist_agent, 
-    METHODOLOGY_PROMPT, 
-    RESULTS_PROMPT, 
-    FUTURE_WORK_PROMPT
-)
 
-# Temporary debugging version for analysis.py
+# The master prompt that asks for everything at once.
+COMPREHENSIVE_ANALYSIS_PROMPT = """
+Provide a comprehensive technical analysis of the document for a knowledgeable audience (e.g., graduate students, researchers). Structure your response in Markdown with the following sections, in this exact order:
+
+## 1. Abstract Summary
+(A concise summary of the paper's core contributions, methods, and key results, similar to a conference abstract.)
+
+## 2. Core Architecture and Methodology
+(Deconstruct the system's architecture and the flow of data or logic. Use bullet points to detail key components and algorithms. Be technically precise.)
+
+## 3. Quantitative Results & Critical Analysis
+(Present the main quantitative results in a list or responsive format (NO WIDE TABLES). Provide a brief but critical analysis of what these results mean.)
+
+## 4. Positioning in the Field
+(Situate this work by comparing it to 1-2 key alternative approaches mentioned in the paper, highlighting its unique technical differentiators.)
+
+## 5. Proposed Future Research Directions
+(Propose 2-3 concrete, technically-grounded hypotheses and experimental ideas for extending this research based on the paper's conclusion or limitations.)
+"""
 
 def run_analysis_on_single_paper(documents):
     """
-    This is a temporary debug function.
-    It IGNORES all AI agents and simply returns the raw text of the first
-    page of the uploaded document to prove the correct file is being read.
+    This simplified version creates an index and runs a single, comprehensive query against it.
     """
-    print("--- DEBUG: Inside the 'run_analysis_on_single_paper' function. ---")
+    print("--- Simplified Analysis: Indexing the document... ---")
+    # This creates the index in memory for analysis
+    index = VectorStoreIndex.from_documents(documents)
     
-    if not documents:
-        return "Error: No document content was received."
-        
-    # Get the text from the first document object (usually the first page)
-    first_page_text = documents[0].text
+    print("--- Simplified Analysis: Creating Query Engine... ---")
+    # A query engine is a stable way to ask questions about the document
+    query_engine = index.as_query_engine(
+        response_mode="tree_summarize",  # This mode is excellent for summarizing a whole document
+    )
+
+    print("--- Simplified Analysis: Running comprehensive query... ---")
+    # We run our one big prompt against the entire document.
+    final_report = query_engine.query(COMPREHENSIVE_ANALYSIS_PROMPT)
     
-    # We will return the first 1500 characters to display in the UI
-    output_text = f"""
-    --- CONTENT VERIFICATION TEST ---
-
-    **The application is correctly reading the new PDF.** Here is the raw text from the beginning of the uploaded document:
-
-    ---
-    
-    {first_page_text[:1500]}...
-    """
-    
-    print("--- DEBUG: Successfully extracted text. Returning to UI. ---")
-    return output_text
-    
-# def run_analysis_on_single_paper(documents):
-#     """
-#     Orchestrates the multi-agent analysis for a single paper.
-#     It now uses the globally set LLM from Settings.
-#     """
-
-#     print("--- SUCCESS: Entered run_analysis_on_single_paper function---")
-#     # Step 1: Librarian Agent builds the knowledge base (uses the global embed_model)
-#     print("Librarian Agent: Indexing the document...")
-#     index = VectorStoreIndex.from_documents(documents)
-#     query_tool = get_query_tool(index)
-#     print("Librarian Agent: Knowledge base is ready.")
-
-#     # Step 2: Assemble the specialist team, using the global Settings.llm
-#     specialists = {
-#         "Methodology": create_specialist_agent(METHODOLOGY_PROMPT, Settings.llm, query_tool),
-#         "Results": create_specialist_agent(RESULTS_PROMPT, Settings.llm, query_tool),
-#         # "Citations": create_specialist_agent(CITATION_PROMPT, Settings.llm, query_tool),
-#         "Future Work": create_specialist_agent(FUTURE_WORK_PROMPT, Settings.llm, query_tool),
-#     }
-
-#     # Step 3: Run specialists in parallel
-#     print("Lead Researcher: Delegating tasks to specialists in parallel...")
-#     individual_reports = {}
-#     tasks = {
-#         "Methodology": "Analyze the methodology in detail.",
-#         "Results": "Summarize the key results and performance metrics.",
-#         # "Citations": "Identify and explain the importance of foundational citations.",
-#         "Future Work": "List the identified research gaps and future work.",
-#     }
-    
-#     with concurrent.futures.ThreadPoolExecutor() as executor:
-#         future_to_role = {executor.submit(agent.chat, tasks[role]): role for role, agent in specialists.items()}
-#         for future in concurrent.futures.as_completed(future_to_role):
-#             role = future_to_role[future]
-#             try:
-#                 result = future.result()
-#                 individual_reports[role] = result.response
-#                 print(f"Lead Researcher: Received report from {role} Analyst.")
-#             except Exception:
-#                 # --- DEBUGGING CODE ---
-#                 print(f"--- ERROR processing role: {role} ---")
-#                 traceback.print_exc()
-#                 individual_reports[role] = f"An error occurred while processing the '{role}' section."
-
-#     # Step 4: Synthesize the final report using the global Settings.llm
-#     print("Lead Researcher: Synthesizing final report...")
-
-#     synthesis_prompt = f"""You are a Lead Researcher compiling a technical brief for a research group. Synthesize the reports from your specialist agents into a single, structured, and technically deep analysis. The intended audience is graduate students and researchers in the field.
-
-#     Structure the final report in Markdown exactly as follows:
-
-#     # Technical Analysis: [Paper Title - Generate a fitting title]
-
-#     ## 1. Abstract Summary
-#     (Provide a concise summary of the paper's core contributions, methods, and key results, similar to a conference abstract.)
-
-#     ---
-
-#     ## 2. Core Architecture and Methodology
-#     (Synthesize the Methodology Analyst's report. Deconstruct the system's architecture and the flow of data or logic. Use bullet points to detail key components and algorithms.)
-
-#     ---
-
-#     ## 3. Quantitative Results & Critical Analysis
-#     (Synthesize the Results Analyst's report. Display the main data in tables. Provide a critical analysis of what these results mean, their statistical significance, and how they support the paper's thesis.)
-
-#     ---
-
-#     ## 4. Proposed Future Research Directions
-#     (Synthesize the Future-Work Scout's report. Present the concrete, technically-grounded hypotheses and experimental ideas for extending this research.)
-
-#     Generate the final, synthesized report.
-#     """
-    
-#     final_report = Settings.llm.complete(synthesis_prompt, max_tokens=4096)
-#     return final_report.text
+    print("--- Simplified Analysis: Analysis complete. ---")
+    return str(final_report)
