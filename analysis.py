@@ -14,7 +14,8 @@ def run_analysis_on_single_paper(documents):
     Orchestrates the multi-agent analysis for a single paper.
     It now uses the globally set LLM from Settings.
     """
-    
+
+    print("--- SUCCESS: Entered run_analysis_on_single_paper function---")
     # Step 1: Librarian Agent builds the knowledge base (uses the global embed_model)
     print("Librarian Agent: Indexing the document...")
     index = VectorStoreIndex.from_documents(documents)
