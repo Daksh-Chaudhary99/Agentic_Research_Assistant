@@ -1,6 +1,7 @@
 gradio==4.21.0
 pydantic==2.5.3
 fastapi==0.109.2
+mistralai==0.3.0
 llama-index==0.10.55
 llama-index-core==0.10.55
 llama-index-agent-openai==0.2.7
