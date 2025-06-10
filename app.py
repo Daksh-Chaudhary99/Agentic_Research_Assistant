@@ -2,6 +2,7 @@ import gradio as gr
 import os
 from llama_index.core import Settings
 from llama_index.readers.file import PDFReader
+from llama_index.embeddings.mistralai import MistralAIEmbedding
 from utils import get_llm, download_pdf_from_url
 from agents import create_scout_agent
 from analysis import run_analysis_on_single_paper
@@ -14,12 +15,18 @@ def pdf_analysis_flow(pdf_file):
         return "Error: Please upload a PDF file."
         
     try:
-        llm = get_llm() 
+        # --- Set the models globally for LlamaIndex ---
+        # Mistral's embedding API
+        Settings.embed_model = MistralAIEmbedding(model_name="mistral-embed")
+        # Mistral's LLM for thinking/writing
+        Settings.llm = get_llm()
+
         documents = PDFReader().load_data(file=pdf_file.name)
         report_title = f"# Analysis of: *{os.path.basename(pdf_file.name)}*\n\n"
-        final_report = run_analysis_on_single_paper(documents, llm)
+        final_report = run_analysis_on_single_paper(documents)
         return report_title + final_report
     except Exception as e:
+        print(f"An error occurred in pdf_analysis_flow: {e}")
         return f"An error occurred: {e}"
 
 
@@ -29,12 +36,13 @@ def topic_exploration_flow(topic_query):
         return "Error: Please enter a research topic."
 
     try:
-        llm = get_llm()
-        Settings.llm = llm # Set global LLM for the session
+        # --- Set the models globally for LlamaIndex ---
+        Settings.embed_model = MistralAIEmbedding(model_name="mistral-embed")
+        Settings.llm = get_llm()
 
         # 1. Run Scout Agent to get paper URLs
         gr.Info("Scout Agent is searching for relevant papers...")
-        scout_agent = create_scout_agent(llm)
+        scout_agent = create_scout_agent(Settings.llm)
         response = scout_agent.chat(topic_query)
         urls = [line.strip() for line in response.response.split('\n') if line.strip().startswith('http')]
 
@@ -49,7 +57,7 @@ def topic_exploration_flow(topic_query):
             if pdf_stream:
                 documents = PDFReader().load_data(file=pdf_stream)
                 report_title = f"# Analysis of Paper from: *{url}*\n\n"
-                single_report = run_analysis_on_single_paper(documents, llm)
+                single_report = run_analysis_on_single_paper(documents)
                 all_reports.append(report_title + single_report)
             else:
                 all_reports.append(f"## Could not analyze paper from {url}\n\nFailed to download or process the PDF.")
@@ -62,6 +70,7 @@ def topic_exploration_flow(topic_query):
         
         return final_combined_report
     except Exception as e:
+        print(f"An error occurred in topic_exploration_flow: {e}")
         return f"An error occurred: {e}"
 
 # --- Gradio UI Definition ---
@@ -72,7 +81,6 @@ with gr.Blocks(theme=gr.themes.Soft(), title="AI Research Assistant") as demo:
     
     with gr.Tabs():
         with gr.TabItem("Analyze a Specific PDF"):
-            # THIS IS THE LINE THAT WAS CHANGED: type="file" is now type="filepath"
             pdf_input = gr.File(type="filepath", label="Upload Research Paper (PDF)")
             analyze_button_pdf = gr.Button("Analyze Paper", variant="primary")
             pdf_output = gr.Markdown(label="Analysis Report")
@@ -82,7 +90,6 @@ with gr.Blocks(theme=gr.themes.Soft(), title="AI Research Assistant") as demo:
             analyze_button_topic = gr.Button("Explore Topic", variant="primary")
             topic_output = gr.Markdown(label="Combined Analysis Report")
 
-    # Wire up the buttons to the backend functions
     analyze_button_pdf.click(
         fn=pdf_analysis_flow, 
         inputs=[pdf_input], 
