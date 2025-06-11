@@ -1,22 +1,3 @@
-<<<<<<< HEAD
----
-title: Agentic Research Assistant
-emoji: 💬
-colorFrom: yellow
-colorTo: purple
-sdk: gradio
-sdk_version: 5.0.1
-python_version: 3.11
-app_file: app.py
-pinned: false
-tags:
-  - agent-demo-track
-  - Mistral
-  - LlamaIndex
-  - Multi-agent
-short_description: A Multi-Agent based Research Assistant
----
-
 # 🤖 AI Research Assistant
 
 This project is a powerful, AI-powered web application designed to accelerate the process of academic research. It acts as an intelligent partner for researchers, graduate students, and anyone looking to quickly understand and explore scientific literature. The application is built using a modern agentic framework with LlamaIndex and is powered by the Mistral Large Language Model.
