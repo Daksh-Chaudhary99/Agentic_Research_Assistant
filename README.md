@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 title: Agentic Research Assistant
 emoji: 💬
@@ -120,3 +121,7 @@ This project serves as a strong foundation for a more comprehensive research sui
 - **Goal:** Provide constructive criticism on a user's own work.
 - **Functionality:** A new "Critique My Draft" tab will allow users to upload their own draft papers. A team of specialized "critic" agents will then analyze the draft for clarity, methodological soundness, and the strength of its arguments, providing valuable feedback.
 - **Implementation:** This would involve creating a new set of system prompts in `agents.py` focused on critique and feedback, and a new workflow to manage this analysis.
+=======
+# Agentic_Research_Assistant
+A Multi-Agent based Research Assistant
+>>>>>>> 9ed14f0a15a52d163ed0fee58c986d0db18b0997
