@@ -1,4 +1,4 @@
-# 🤖 AI Research Assistant
+# AI Research Assistant
 
 This project is a powerful, AI-powered web application designed to accelerate the process of academic research. It acts as an intelligent partner for researchers, graduate students, and anyone looking to quickly understand and explore scientific literature. The application is built using a modern agentic framework with LlamaIndex and is powered by the Mistral Large Language Model.
 
